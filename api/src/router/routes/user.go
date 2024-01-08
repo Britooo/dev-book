@@ -1,4 +1,4 @@
-package path
+package routes
 
 import (
 	"api/src/controller"
