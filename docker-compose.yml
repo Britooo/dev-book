@@ -1,0 +1,40 @@
+version: '3.1'
+
+services:
+  db:
+    container_name: devbook-db
+    image: mysql:5.7
+    volumes:
+      - ./mysql:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: devbook
+      MYSQL_USER: devbook
+      MYSQL_PASSWORD: devbook
+    ports:
+      - 3306:3306
+    restart: always
+    healthcheck:
+        test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-proot"]
+        interval: 5s
+        timeout: 5s
+        retries: 3
+    networks:
+      - devbook-network
+  
+  api:
+    container_name: devbook-api
+    build: 
+      context: ./api
+      dockerfile: dev.Dockerfile
+    ports:
+      - 3000:3000
+    working_dir: /root
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - devbook-network
+networks:
+  devbook-network:
+    driver: bridge
